@@ -286,7 +286,5 @@ function route() {
   window.scrollTo(0, 0);
 }
 
-const contactLink = document.getElementById("nav-contact");
-contactLink.href = `mailto:${site.email}`;
 window.addEventListener("hashchange", route);
 route();
