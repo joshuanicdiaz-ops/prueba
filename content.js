@@ -26,7 +26,7 @@ window.PORTFOLIO = {
   },
 
   bio: {
-    photo: "images/portraits/01.jpg",
+    photo: "images/bio/portrait.jpg",
     photoCredit: "",
     paragraphs: [
       "Born in 1997 in Guatemala City, he approaches the camera as a bridge between concept and form, using it to translate ideas into a precise visual language that moves fluidly between sensory exploration and commercial work.",
