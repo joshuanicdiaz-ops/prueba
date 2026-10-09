@@ -241,7 +241,7 @@ function viewFilm(slug) {
 function viewBio() {
   const contact = [
     site.email && `<a href="mailto:${esc(site.email)}">${esc(site.email)}</a>`,
-    site.instagram && `<a href="${esc(site.instagram)}" target="_blank" rel="noopener">Instagram</a>`,
+    site.instagram && `<a href="${esc(site.instagram)}" target="_blank" rel="noopener">@${esc(site.instagram.replace(/\/+$/, "").split("/").pop())}</a>`,
     site.vimeo && `<a href="${esc(site.vimeo)}" target="_blank" rel="noopener">Vimeo</a>`
   ].filter(Boolean);
   const block = (title, items) => `<div><h2 class="mono">[ ${esc(title)} ]</h2><ul>${items.map(x => `<li>${x}</li>`).join("")}</ul></div>`;

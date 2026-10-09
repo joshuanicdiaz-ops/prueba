@@ -8,9 +8,9 @@ window.PORTFOLIO = {
   site: {
     name: "Joshua Díaz",
     title: "Joshua Díaz, photographer and video producer",
-    email: "hello@joshuadiaz.com",
-    instagram: "https://instagram.com/",
-    vimeo: "https://vimeo.com/",
+    email: "info@furia-studio.com",
+    instagram: "https://www.instagram.com/joshudiaz",
+    vimeo: "",
 
     // Home slideshow. Seconds per photo and fade length in seconds (0 = hard cut).
     // Leave "photos" empty to use the first photo of every project.
@@ -29,13 +29,11 @@ window.PORTFOLIO = {
     photo: "images/portraits/01.jpg",
     photoCredit: "",
     paragraphs: [
-      "Joshua Díaz is a photographer and video producer based in Guatemala City. He works across portraiture, travel and events, with a focus on light, place and the people inside it.",
-      "Alongside his personal work he produces commercial and testimonial films with FURIA STUDIO, for clients in Central America and the United States. He works in English and Spanish."
+      "Born in 1997 in Guatemala City, he approaches the camera as a bridge between concept and form, using it to translate ideas into a precise visual language that moves fluidly between sensory exploration and commercial work.",
+      "He values experimentation and clarity, seeking images that reveal structure, atmosphere, and the quiet tension within each project.",
+      "His practice spans photography and video, guided by light and a persistent curiosity for new ways of seeing."
     ],
-    lists: [
-      { title: "Services", items: ["Photography", "Event and travel coverage", "Testimonial films", "Production and post-production"] },
-      { title: "Selected clients", items: ["ASEA", "FURIA STUDIO"] }
-    ]
+    lists: []
   },
 
   /*
