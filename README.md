@@ -18,8 +18,7 @@ videos/               Clips cortos para los fondos de la página de Video
 
 ## Páginas
 
-- **Photo (inicio):** slide a pantalla completa que avanza solo y se pausa al pasar el cursor. Al hacer clic en la foto se abre el visor con zoom real (rueda del mouse, doble clic o pellizcar en el celular). Abajo, la cuadrícula de proyectos.
-- **Proyecto:** fotos una debajo de otra, centradas. Clic en cualquiera para hacer zoom.
+- **Photo:** slide que avanza solo. A la izquierda de la foto el cursor es una flecha para retroceder, a la derecha para avanzar, y en el centro abre el zoom (en el celular se desliza con el dedo). Abajo, una cuadrícula de fotos; clic en cualquiera para hacer zoom.
 - **Video:** títulos grandes sobre un clip de fondo. Al pasar el cursor por un título cambia el fondo. Clic para ver el video completo.
 - **Bio:** texto abajo a la izquierda y foto grande a la derecha.
 
@@ -38,18 +37,15 @@ Para usar un dominio propio: **Settings > Pages > Custom domain**, escribe tu do
 
 **Antes de publicar, reemplaza:** el correo (`hello@joshuadiaz.com` es de ejemplo), los enlaces de Instagram y Vimeo, la bio y su foto, los proyectos y videos de muestra, y `images/share.jpg` (la imagen que aparece al compartir el link, 1200 x 630 px).
 
-### Slide del inicio
+### Slide del inicio (`site.slideshow`)
 - `seconds`: segundos por foto en computadora. `fade`: duración del fundido (0 = corte seco).
 - `mobileSeconds` y `mobileFade`: lo mismo para celular.
-- `photos`: las fotos del slide. Si lo dejas vacío usa la primera foto de cada proyecto. Para elegirlas:
-  `{ src: "images/fuego/03.jpg", project: "fuego" }` (el `project` hace que el pie de foto lleve al proyecto).
+- `photos`: las fotos del slide, en orden. Cada una: `{ src: "images/carpeta/foto.jpg", w: 1333, h: 2000 }`.
 
-### Proyectos de foto
-- Copia un bloque completo de proyecto y cambia los datos. El orden de la lista es el orden en el sitio.
-- `slug` es la dirección del proyecto: solo minúsculas, números y guiones.
-- La primera foto es la portada; para otra, agrega `cover: "images/carpeta/foto.jpg"`.
-- `caption` (opcional) pone un pie de foto debajo de esa imagen.
-- `w` y `h` (opcional) son el tamaño en píxeles de la foto. Si los pones, el zoom abre más rápido.
+### Cuadrícula de fotos (`photos` y `site.grid`)
+- `photos`: las fotos de la cuadrícula, en orden. Mismo formato que las del slide.
+- `site.grid.columns`: fotos por fila en computadora. `mobileColumns`: en celular.
+- `w` y `h` son el tamaño en píxeles de la foto (opcional, hace que el zoom abra más rápido).
 
 ### Videos
 Cada video tiene dos partes:

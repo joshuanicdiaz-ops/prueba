@@ -1,4 +1,5 @@
-const { site, bio, projects, videos } = window.PORTFOLIO;
+const { site, bio, videos } = window.PORTFOLIO;
+const gridPhotos = window.PORTFOLIO.photos || [];
 const app = document.getElementById("app");
 const bg = document.querySelector(".bgvideo");
 const bgVids = [...bg.querySelectorAll("video")];
@@ -6,13 +7,11 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const isSmall = () => matchMedia("(max-width: 820px)").matches;
 
 const esc = (s = "") => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const coverOf = p => p.cover || (p.photos[0] || {}).src || "";
-const bySlug = slug => projects.find(p => p.slug === slug);
 let cleanup = () => {};
 
 /* ---------- Image sizes (needed for zoom) ---------- */
 const sizes = new Map();
-projects.forEach(p => p.photos.forEach(ph => { if (ph.w && ph.h) sizes.set(ph.src, { w: ph.w, h: ph.h }); }));
+[...((site.slideshow || {}).photos || []), ...gridPhotos].forEach(ph => { if (ph.w && ph.h) sizes.set(ph.src, { w: ph.w, h: ph.h }); });
 function track(img) {
   const save = () => { if (img.naturalWidth) sizes.set(img.getAttribute("src"), { w: img.naturalWidth, h: img.naturalHeight }); };
   if (img.complete) save(); else img.addEventListener("load", save, { once: true });
@@ -50,48 +49,49 @@ async function zoom(items, index, onClose) {
   pswp.init();
 }
 
-/* ---------- PHOTO: home ---------- */
+/* ---------- PHOTO: home (slideshow + grid) ---------- */
 function viewPhoto() {
   const cfg = site.slideshow || {};
-  const list = (cfg.photos && cfg.photos.length ? cfg.photos : projects.map(p => ({ src: coverOf(p), project: p.slug })))
-    .map(it => {
-      const p = bySlug(it.project) || {};
-      const ph = (p.photos || []).find(x => x.src === it.src) || {};
-      return { src: it.src, alt: ph.alt || p.title || "", project: p.slug, title: p.title || "", year: p.year || "" };
-    });
+  const list = (cfg.photos || []).map(ph => ({ src: ph.src, alt: ph.alt || "" }));
+  const grid = (site.grid || {});
 
-  const works = projects.map((p, i) => `
-    <a class="work" href="#/work/${esc(p.slug)}">
-      <span class="box"><img src="${esc(coverOf(p))}" alt="${esc(p.title)}" loading="${i < 3 ? "eager" : "lazy"}" decoding="async"></span>
-      <span><span class="t"><em>${esc(p.title)}</em>${p.year ? `, ${esc(p.year)}` : ""}</span><span class="p mono" style="display:block">${esc(p.place || "")}</span></span>
-    </a>`).join("");
+  const cells = gridPhotos.map((ph, i) => `
+    <button type="button" class="cell" data-i="${i}" aria-label="Open photo ${i + 1}">
+      <img src="${esc(ph.src)}" alt="${esc(ph.alt || "")}" loading="lazy" decoding="async" ${ph.w ? `width="${ph.w}" height="${ph.h}"` : ""}>
+    </button>`).join("");
 
   app.innerHTML = `
     <h1 class="sr">Photography</h1>
-    <section class="hero" tabindex="0" aria-roledescription="carousel" aria-label="Featured photos. Use the arrow keys to move, Enter to zoom.">
-      <div class="hero-stage" role="button" aria-label="Zoom photo">
+    ${list.length ? `
+    <section class="hero" aria-roledescription="carousel" aria-label="Featured photos">
+      <div class="hero-stage">
         <img alt="" fetchpriority="high"><img alt="">
+        <button type="button" class="zone zone-prev" aria-label="Previous photo"></button>
+        <button type="button" class="zone zone-zoom" aria-label="Zoom photo"></button>
+        <button type="button" class="zone zone-next" aria-label="Next photo"></button>
       </div>
       <div class="hero-meta">
-        <a class="hero-cap" href="#/"></a>
         <div class="hero-tools mono"><span class="count" aria-live="off"></span><button type="button" class="toggle">Pause</button></div>
       </div>
-    </section>
-    <section class="works" aria-label="Projects">${works}</section>`;
-  app.querySelectorAll(".works img").forEach(track);
+    </section>` : ""}
+    ${gridPhotos.length ? `<section class="photo-grid" aria-label="Photos" style="--cols:${grid.columns || 4};--cols-m:${grid.mobileColumns || 2}">${cells}</section>` : ""}`;
+
+  app.querySelectorAll(".photo-grid .cell").forEach(cell => {
+    track(cell.querySelector("img"));
+    cell.addEventListener("click", () => zoom(gridPhotos, Number(cell.dataset.i)));
+  });
   if (!list.length) return;
 
   const hero = app.querySelector(".hero");
   const stage = hero.querySelector(".hero-stage");
   const layers = [...stage.querySelectorAll("img")];
-  const cap = hero.querySelector(".hero-cap");
   const count = hero.querySelector(".count");
   const toggle = hero.querySelector(".toggle");
-  const pause = { hover: false, focus: false, hidden: false, zoom: false, user: reduceMotion };
+  const pause = { hidden: false, zoom: false, user: reduceMotion };
   let i = 0, front = 0, timer = 0;
 
-  const seconds = () => (isSmall() ? cfg.mobileSeconds || Math.max(cfg.seconds || 2, 3) : cfg.seconds || 2);
-  const fade = () => (isSmall() ? (cfg.mobileFade ?? 0.6) : (cfg.fade ?? 0));
+  const seconds = () => (isSmall() ? cfg.mobileSeconds || 3 : cfg.seconds || 1.5);
+  const fade = () => (isSmall() ? (cfg.mobileFade ?? 0.4) : (cfg.fade ?? 0));
   const paused = () => Object.values(pause).some(Boolean);
 
   function show(n, first) {
@@ -102,9 +102,6 @@ function viewPhoto() {
     back.alt = it.alt;
     const swap = () => {
       back.classList.add("on"); layers[front].classList.remove("on"); front = 1 - front;
-      track(back);
-      cap.href = it.project ? `#/work/${it.project}` : "#/";
-      cap.innerHTML = it.title ? `<em>${esc(it.title)}</em>${it.year ? `, ${esc(it.year)}` : ""}` : "";
       count.textContent = `${String(i + 1).padStart(2, "0")} / ${String(list.length).padStart(2, "0")}`;
       new Image().src = list[(i + 1) % list.length].src; // preload next
     };
@@ -118,57 +115,31 @@ function viewPhoto() {
   }
   function setPause(key, val) { pause[key] = val; toggle.textContent = pause.user ? "Play" : "Pause"; schedule(); }
 
-  stage.addEventListener("mouseenter", () => setPause("hover", true));
-  stage.addEventListener("mouseleave", () => setPause("hover", false));
-  hero.addEventListener("focusin", () => setPause("focus", true));
-  hero.addEventListener("focusout", () => setPause("focus", false));
   const onVis = () => setPause("hidden", document.hidden);
   document.addEventListener("visibilitychange", onVis);
   toggle.addEventListener("click", () => setPause("user", !pause.user));
   const open = () => { setPause("zoom", true); zoom(list, i, () => setPause("zoom", false)); };
-  stage.addEventListener("click", open);
-  hero.addEventListener("keydown", e => {
-    if (e.target !== hero) return;
+  stage.querySelector(".zone-prev").addEventListener("click", () => show(i - 1));
+  stage.querySelector(".zone-next").addEventListener("click", () => show(i + 1));
+  stage.querySelector(".zone-zoom").addEventListener("click", open);
+
+  // Swipe on touch screens
+  let tx = null;
+  stage.addEventListener("touchstart", e => { tx = e.touches[0].clientX; }, { passive: true });
+  stage.addEventListener("touchend", e => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx; tx = null;
+    if (Math.abs(dx) > 40) { e.preventDefault(); show(dx < 0 ? i + 1 : i - 1); }
+  });
+  const onKey = e => {
+    if (!document.body.contains(hero) || document.querySelector(".pswp")) return;
     if (e.key === "ArrowRight") show(i + 1);
     else if (e.key === "ArrowLeft") show(i - 1);
-    else if (e.key === "Enter") open();
-  });
+  };
+  document.addEventListener("keydown", onKey);
 
   show(0, true);
-  cleanup = () => { clearTimeout(timer); document.removeEventListener("visibilitychange", onVis); };
-}
-
-/* ---------- PHOTO: project ---------- */
-function viewProject(slug) {
-  const idx = projects.findIndex(p => p.slug === slug);
-  if (idx < 0) return viewNotFound();
-  const p = projects[idx];
-  const next = projects[(idx + 1) % projects.length];
-  const facts = [p.year, p.place, p.client, p.type].filter(Boolean).map(f => `<span>${esc(f)}</span>`).join("");
-  const shots = p.photos.map((ph, i) => `
-    <figure class="shot">
-      <img src="${esc(ph.src)}" alt="${esc(ph.alt || "")}" data-i="${i}" decoding="async" ${ph.w ? `width="${ph.w}" height="${ph.h}"` : ""}>
-      ${ph.caption ? `<figcaption>${esc(ph.caption)}</figcaption>` : ""}
-    </figure>`).join("");
-
-  app.innerHTML = `
-    <article class="project">
-      <header class="p-head">
-        <h1>${esc(p.title)}</h1>
-        ${p.description ? `<p>${esc(p.description)}</p>` : ""}
-        <div class="mono">${facts}</div>
-      </header>
-      <div class="shots">${shots}</div>
-      <nav class="p-next mono" aria-label="Projects">
-        <a href="#/">All work</a>
-        <a href="#/work/${esc(next.slug)}">Next: ${esc(next.title)}</a>
-      </nav>
-    </article>`;
-  app.querySelectorAll(".shot img").forEach(img => {
-    track(img);
-    img.addEventListener("click", () => zoom(p.photos, Number(img.dataset.i)));
-  });
-  document.title = `${p.title}, ${site.name}`;
+  cleanup = () => { clearTimeout(timer); document.removeEventListener("visibilitychange", onVis); document.removeEventListener("keydown", onKey); };
 }
 
 /* ---------- VIDEO: background clips ---------- */
@@ -271,11 +242,10 @@ function route() {
   const [section, slug] = location.hash.replace(/^#\/?/, "").split("/");
   document.title = site.title;
   let nav = "photo";
-  if (section === "work" && slug) viewProject(decodeURIComponent(slug));
-  else if (section === "video" && slug) { viewFilm(decodeURIComponent(slug)); nav = "video"; }
+  if (section === "video" && slug) { viewFilm(decodeURIComponent(slug)); nav = "video"; }
   else if (section === "video") { viewVideos(); nav = "video"; }
   else if (section === "bio") { viewBio(); nav = "bio"; }
-  else if (!section) viewPhoto();
+  else if (!section || section === "work") viewPhoto();
   else viewNotFound();
 
   document.querySelectorAll(".edge [data-nav]").forEach(a => {
