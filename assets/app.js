@@ -63,7 +63,7 @@ function viewPhoto() {
   const works = projects.map((p, i) => `
     <a class="work" href="#/work/${esc(p.slug)}">
       <span class="box"><img src="${esc(coverOf(p))}" alt="${esc(p.title)}" loading="${i < 3 ? "eager" : "lazy"}" decoding="async"></span>
-      <span><span class="t"><em>${esc(p.title)}</em>, ${esc(p.year)}</span><span class="p mono" style="display:block">${esc(p.place || "")}</span></span>
+      <span><span class="t"><em>${esc(p.title)}</em>${p.year ? `, ${esc(p.year)}` : ""}</span><span class="p mono" style="display:block">${esc(p.place || "")}</span></span>
     </a>`).join("");
 
   app.innerHTML = `
@@ -104,7 +104,7 @@ function viewPhoto() {
       back.classList.add("on"); layers[front].classList.remove("on"); front = 1 - front;
       track(back);
       cap.href = it.project ? `#/work/${it.project}` : "#/";
-      cap.innerHTML = it.title ? `<em>${esc(it.title)}</em>, ${esc(it.year)}` : "";
+      cap.innerHTML = it.title ? `<em>${esc(it.title)}</em>${it.year ? `, ${esc(it.year)}` : ""}` : "";
       count.textContent = `${String(i + 1).padStart(2, "0")} / ${String(list.length).padStart(2, "0")}`;
       new Image().src = list[(i + 1) % list.length].src; // preload next
     };
