@@ -12,6 +12,9 @@ window.PORTFOLIO = {
     instagram: "https://www.instagram.com/joshudiaz",
     vimeo: "",
 
+    // Show the Video section (menu link and page). false = hidden for now.
+    showVideo: false,
+
     // Home slideshow: seconds per photo and fade length in seconds (0 = hard cut).
     slideshow: {
       seconds: 1.5,

@@ -242,6 +242,8 @@ function route() {
   const [section, slug] = location.hash.replace(/^#\/?/, "").split("/");
   document.title = site.title;
   let nav = "photo";
+  const videoOn = site.showVideo !== false;
+  if (section === "video" && !videoOn) { location.replace("#/"); return; }
   if (section === "video" && slug) { viewFilm(decodeURIComponent(slug)); nav = "video"; }
   else if (section === "video") { viewVideos(); nav = "video"; }
   else if (section === "bio") { viewBio(); nav = "bio"; }
@@ -256,5 +258,6 @@ function route() {
   window.scrollTo(0, 0);
 }
 
+if (site.showVideo === false) document.querySelectorAll('.edge [data-nav="video"]').forEach(a => a.remove());
 window.addEventListener("hashchange", route);
 route();
