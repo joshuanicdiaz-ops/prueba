@@ -5,8 +5,7 @@ Sitio estático (HTML, CSS y JavaScript) listo para GitHub Pages. No necesita in
 ## Estructura
 
 ```
-index.html            Página de inicio temporal (solo el nombre, en construcción)
-preview.html          El portafolio completo (oculto, no aparece en buscadores)
+index.html            Estructura del portafolio (casi nunca se toca)
 content.js            TODO el contenido: textos, proyectos, fotos, videos, bio
 assets/style.css      Diseño
 assets/app.js         Funcionamiento (slide, zoom, video, navegación)
